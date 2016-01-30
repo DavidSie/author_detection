@@ -4,6 +4,8 @@ __author__ = 'davidsiecinski'
 
 
 class fileReader:
+    system_files=[".DS_Store"]
+
     def prepare_enironment(self, base_path=None):
          # creating  environment at base_path
         data_path=""
@@ -35,20 +37,28 @@ class fileReader:
 
     def load_all_files_from_dir(self,dir_path):
         list_of_texts=[]
-        for filename in os.listdir(os.getcwd(dir_path)):
-            with open(filename, 'r') as myfile:
-               list_of_texts.append(myfile.read().replace('\n', ''))
+        for filename in os.listdir(dir_path):
+            if filename not in self.system_files:
+                with open(dir_path+"/"+filename, 'r') as myfile:
+                   list_of_texts.append(myfile.read().replace('\n', ''))
         return list_of_texts
 
     def load_author_files(self,dir_path):
-        author=os.path.dirname(dir_path)
-        return author, self.load_all_files_from_dir(dir_path)
+        folders=dir_path.split("/")
+        author=folders[len(folders)-1]
+        return (author, self.load_all_files_from_dir(dir_path))
 
     def load_all_data_to_learn(self,dir_path):
         all_data=[]
+        if dir_path=="" or dir_path==None:
+            dir_path="data/learning"
+        else:
+            dir_path+="/data/learning"
+
         if "learning"  in dir_path:
-            for filename in os.listdir(os.getcwd(dir_path)):
-                all_data.append(self.load_author_files(dir_path))
+            for filename in os.listdir(dir_path):
+                if filename not in self.system_files:
+                    all_data.append(self.load_author_files(dir_path+"/"+filename))
         else:
             raise IOError("path: "+dir_path+"in not a  'learning' directory")
         return all_data
